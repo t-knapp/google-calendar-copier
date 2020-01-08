@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using GoogleCalendarCopier.Configuration;
+using GoogleCalendarCopier.EventFilter;
 
 namespace GoogleCalendarCopier
 {
@@ -31,6 +32,11 @@ namespace GoogleCalendarCopier
 
             IConfigurationProvider configurationProvider = new JsonConfigurationProvider(args[0]);
             var configuration = await configurationProvider.Read();
+
+            IEventFilter[] filters = configuration.SummaryValues.Select(value => new SummaryFilter(value)).ToArray();
+            filters = filters.Concat(configuration.DescriptionValues.Select(value => new DescriptionFilter(value))).ToArray();
+
+            IEventFilter eventFilter = new OrFilter(filters);
 
             //////////////////////////////////
             UserCredential credential;
@@ -64,7 +70,7 @@ namespace GoogleCalendarCopier
                 request.TimeMin = DateTime.Now;
                 request.ShowDeleted = false;
                 request.SingleEvents = true;
-                request.MaxResults = 10;
+                request.MaxResults = 50;
                 request.OrderBy = EventsResource.ListRequest.OrderByEnum.StartTime;
 
                 // List events.
@@ -74,13 +80,16 @@ namespace GoogleCalendarCopier
                 {
                     foreach (var eventItem in events.Items)
                     {
-                        string when = eventItem.Start.DateTime.ToString();
-                        if (String.IsNullOrEmpty(when))
+                        if (eventFilter.KeepEvent(eventItem))
                         {
-                            when = eventItem.Start.Date;
+                            string when = eventItem.Start.DateTime.ToString();
+                            if (String.IsNullOrEmpty(when))
+                            {
+                                when = eventItem.Start.Date;
+                            }
+                            Console.WriteLine("{0} ({1})", eventItem.Summary, when);
+                            //Console.WriteLine("\t{0}", eventItem.Description);
                         }
-                        Console.WriteLine("{0} ({1})", eventItem.Summary, when);
-                        Console.WriteLine("\t{0}", eventItem.Description);
                     }
                 }
                 else
