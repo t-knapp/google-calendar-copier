@@ -363,3 +363,5 @@ MigrationBackup/
 # Application
 token.json/*
 credentials.json
+
+config/*
