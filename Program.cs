@@ -21,7 +21,7 @@ namespace GoogleCalendarCopier
         static string[] Scopes = { CalendarService.Scope.CalendarReadonly };
         static string ApplicationName = "Google Calendar API .NET Quickstart";
 
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             if (args.Length == 0)
             {
@@ -30,7 +30,7 @@ namespace GoogleCalendarCopier
             }
 
             IConfigurationProvider configurationProvider = new JsonConfigurationProvider(args[0]);
-            var configuration = configurationProvider.Read().Result;
+            var configuration = await configurationProvider.Read();
 
             //////////////////////////////////
             UserCredential credential;
@@ -41,12 +41,12 @@ namespace GoogleCalendarCopier
                 // The file token.json stores the user's access and refresh tokens, and is created
                 // automatically when the authorization flow completes for the first time.
                 string credPath = "token.json";
-                credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
+                credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
                     GoogleClientSecrets.Load(stream).Secrets,
                     Scopes,
                     "user",
                     CancellationToken.None,
-                    new FileDataStore(credPath, true)).Result;
+                    new FileDataStore(credPath, true));
                 Console.WriteLine("Credential file saved to: " + credPath);
             }
 
