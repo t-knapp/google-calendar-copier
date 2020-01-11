@@ -23,9 +23,9 @@ namespace GoogleCalendarCopier
 
         static async Task Main(string[] args)
         {
-            if (args.Length == 0)
+            if (args.Length != 2)
             {
-                Console.WriteLine("usage: dotnet run <configfilePath>");
+                Console.WriteLine("usage: dotnet run <configfilePath> <credentialsFolderPath>");
                 return;
             }
 
@@ -41,9 +41,9 @@ namespace GoogleCalendarCopier
             UserCredential credential;
 
             using (var stream =
-                new FileStream("credentials.json", FileMode.Open, FileAccess.Read))
+                new FileStream(args[1] + "credentials.json", FileMode.Open, FileAccess.Read))
             {
-                string credPath = "tokens";
+                string credPath = args[1];
                 credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
                     GoogleClientSecrets.Load(stream).Secrets,
                     Scopes,

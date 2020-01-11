@@ -1,0 +1,5 @@
+obj/
+bin/
+tokens/
+config/
+credentials.json
