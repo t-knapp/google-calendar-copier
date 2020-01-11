@@ -13,5 +13,5 @@ RUN dotnet publish -c Release -o out
 FROM mcr.microsoft.com/dotnet/core/runtime:2.2
 WORKDIR /app
 COPY --from=build-env /app/out .
-VOLUME /config
-ENTRYPOINT ["dotnet", "google-calendar-copier.dll", "/config/config.json"]
+VOLUME [ "/config", "/credentials" ]
+ENTRYPOINT ["dotnet", "google-calendar-copier.dll", "/config/config.json", "/credentials/"]
