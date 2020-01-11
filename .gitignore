@@ -361,7 +361,6 @@ MigrationBackup/
 *.code-workspace
 
 # Application
-token.json/*
+tokens/*
 credentials.json
-
 config/*
