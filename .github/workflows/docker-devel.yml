@@ -20,3 +20,9 @@ jobs:
             -o type=registry \
             -t tknapp/google-calendar-copier:devel \
             .
+      - name: Publish to Registry
+        uses: elgohr/Publish-Docker-Github-Action@master
+        with:
+          name: tknapp/google-calendar-copier
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
