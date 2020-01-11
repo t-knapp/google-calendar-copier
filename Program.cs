@@ -12,14 +12,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using GoogleCalendarCopier.Configuration;
 using GoogleCalendarCopier.EventFilter;
+using GoogleCalendarCopier.EventSource;
 
 namespace GoogleCalendarCopier
 {
     class Program
     {
-        // If modifying these scopes, delete your previously saved credentials
-        // at ~/.credentials/calendar-dotnet-quickstart.json
-        static string[] Scopes = { CalendarService.Scope.CalendarReadonly };
+        static string[] Scopes = { CalendarService.Scope.CalendarEvents };
         static string ApplicationName = "Google Calendar API .NET Quickstart";
 
         static async Task Main(string[] args)
@@ -63,44 +62,30 @@ namespace GoogleCalendarCopier
                 ApplicationName = ApplicationName,
             });
 
+            Events sourceEvents;
+            ListRequestBuilder listRequestBuilder;
+            List<Event> allSourceEvents = new List<Event>();
             foreach (var sourceCalendar in configuration.SourceCalendars)
             {
-                // Define parameters of request.
-                EventsResource.ListRequest request = service.Events.List(sourceCalendar);
-                request.TimeMin = DateTime.Now;
-                request.ShowDeleted = false;
-                request.SingleEvents = true;
-                request.MaxResults = 50;
-                request.OrderBy = EventsResource.ListRequest.OrderByEnum.StartTime;
-
-                // List events.
-                Events events = request.Execute();
-                Console.WriteLine("Upcoming events:");
-                if (events.Items != null && events.Items.Count > 0)
-                {
-                    foreach (var eventItem in events.Items)
-                    {
-                        if (eventFilter.KeepEvent(eventItem))
-                        {
-                            string when = eventItem.Start.DateTime.ToString();
-                            if (String.IsNullOrEmpty(when))
-                            {
-                                when = eventItem.Start.Date;
-                            }
-                            Console.WriteLine("{0} ({1})", eventItem.Summary, when);
-                            //Console.WriteLine("\t{0}", eventItem.Description);
-                        }
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("No upcoming events found.");
-                }
+                listRequestBuilder = new ListRequestBuilder(service, sourceCalendar);
+                EventsResource.ListRequest request = listRequestBuilder.ListRequest;
+                sourceEvents = request.Execute();
+                if (sourceEvents.Items != null && sourceEvents.Items.Count > 0)
+                    allSourceEvents.AddRange(sourceEvents.Items.Where((e) => eventFilter.KeepEvent(e)));
             }
-            
-            Console.Read();
 
+            foreach (var eventItem in allSourceEvents)
+            {
+                string when = eventItem.Start.DateTime.ToString();
+                if (String.IsNullOrEmpty(when))
+                {
+                    when = eventItem.Start.Date;
+                }
+                Console.WriteLine("{0} ({1})", eventItem.Summary, when);
+                //insertRequest = service.Events.Insert(eventItem, configuration.DestinationCalendar);
+                //insertRequest.Execute();
+                //Console.WriteLine("\t{0}", eventItem.Description);
+            }
         }
-
     }
 }
