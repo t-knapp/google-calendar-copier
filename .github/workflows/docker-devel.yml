@@ -28,4 +28,4 @@ jobs:
             -o type=registry \
             -t tknapp/google-calendar-copier:devel \
             $DEVEL \
-            --file ./docker-image/Dockerfile ./docker-image
+            .
