@@ -1,7 +1,7 @@
 using System;
 using Google.Apis.Calendar.v3;
 
-namespace GoogleCalendarCopier.EventSource {
+namespace GoogleCalendarCopier.RequestBuilders {
     public class ListRequestBuilder {
         public EventsResource.ListRequest ListRequest { private set; get; }
 
