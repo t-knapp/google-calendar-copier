@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1.100-buster-arm64v8 as build-env
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1.100 as build-env
 WORKDIR /app
 
 # Copy csproj and restore as distinct layers
