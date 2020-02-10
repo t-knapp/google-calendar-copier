@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/core/sdk:2.2 as build-env
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1 as build-env
 WORKDIR /app
 
 # Copy csproj and restore as distinct layers
@@ -7,10 +7,10 @@ RUN dotnet restore
 
 # Copy everything else and build
 COPY . ./
-RUN dotnet publish -c Release -o out
+RUN dotnet publish -c Release -o out -r linux-arm
 
 # Build runtime image
-FROM mcr.microsoft.com/dotnet/core/runtime:2.2
+FROM mcr.microsoft.com/dotnet/core/runtime:3.1-buster-slim-arm32v7
 WORKDIR /app
 COPY --from=build-env /app/out .
 VOLUME [ "/config", "/credentials" ]

@@ -11,20 +11,18 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v1
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: crazy-max/ghaction-docker-buildx@v1.0.2
-        with:
-          version: latest
-      - name: Available platforms
-        run: echo ${{ steps.buildx.outputs.platforms }}
       - name: Docker login
         run: | 
           echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin  
       - name: Run Buildx
         run: |
-          docker buildx build \
-            --platform linux/amd64,linux/arm/v7,linux/arm64,linux/arm/v6\
+          docker build \
             -o type=registry \
             -t tknapp/google-calendar-copier:devel \
             .
+      - name: Publish to Registry
+        uses: elgohr/Publish-Docker-Github-Action@master
+        with:
+          name: tknapp/google-calendar-copier
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
