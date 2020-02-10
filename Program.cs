@@ -73,23 +73,25 @@ namespace GoogleCalendarCopier
 
             List<Event> allDestinationEvents = new List<Event>();
             listRequestBuilder = new ListRequestBuilder(service, configuration.DestinationCalendar);
+            listRequestBuilder.ShowDeleted(true);
             Events destinationEvents = listRequestBuilder.ListRequest.Execute();
             if (destinationEvents.Items != null && destinationEvents.Items.Count > 0)
                 allDestinationEvents.AddRange(destinationEvents.Items);
             
-            IList<Event> newEvents = allSourceEvents.Where(
-                (e) => !(allDestinationEvents.Select(destEvent => destEvent.Id)).Contains(e.Id)
-            ).ToList();
+            IList<Event> newEvents = allSourceEvents.Except(allDestinationEvents).ToList();
 
             Console.WriteLine("Relevant Source Events");
             PrintEvents(allSourceEvents);
-            
+
+            Console.WriteLine();            
             Console.WriteLine("Destination Events");
             PrintEvents(allDestinationEvents);
 
+            Console.WriteLine();
             Console.WriteLine("New Events to insert");
             PrintEvents(newEvents);
 
+            Console.WriteLine();
             Console.WriteLine("Inserted Events");
             InsertEvents(service, newEvents, configuration.DestinationCalendar);
         }
@@ -97,7 +99,7 @@ namespace GoogleCalendarCopier
         private static void PrintEvents(IList<Event> events)
         {
             foreach (var eventItem in events)
-                Console.WriteLine("id: {0} {1} ({2})", eventItem.Id, eventItem.Summary, eventItem.When());
+                Console.WriteLine("id: {0} {1} ({2}) Status: {3}", eventItem.Id, eventItem.Summary, eventItem.When(), eventItem.Status);
         }
 
         private static void InsertEvents(CalendarService service, IList<Event> events, string destinationCalendar)
@@ -110,11 +112,12 @@ namespace GoogleCalendarCopier
             foreach (var e in events)
             {
                 try {
+                    Console.WriteLine("Inserting: id: {0} {1} ({2})", e.Id, e.Summary, e.When());
                     request = service.Events.Insert(e, destinationCalendar);
                     insertedEvent = request.Execute();
-                    Console.WriteLine("id: {0} {1} ({2})", insertedEvent.Id, insertedEvent.Summary, insertedEvent.When());
+                    Console.WriteLine("Inserted: id: {0} {1} ({2})", insertedEvent.Id, insertedEvent.Summary, insertedEvent.When());
                 } catch (Exception ex) {
-                    Console.WriteLine("Exception inserting Event", ex.Message);
+                    Console.WriteLine("Exception inserting Event: {0}", ex.Message);
                 }
             }
         }
