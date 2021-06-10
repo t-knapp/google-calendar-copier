@@ -78,7 +78,8 @@ namespace GoogleCalendarCopier
             if (destinationEvents.Items != null && destinationEvents.Items.Count > 0)
                 allDestinationEvents.AddRange(destinationEvents.Items);
             
-            IList<Event> newEvents = allSourceEvents.Except(allDestinationEvents).ToList();
+            IEnumerable<string> allDestinationEventIds = allDestinationEvents.Select(item => item.Id);
+            IList<Event> newEvents = allSourceEvents.Where(item => !allDestinationEventIds.Contains(item.Id)).ToList();
 
             Console.WriteLine("Relevant Source Events");
             PrintEvents(allSourceEvents);

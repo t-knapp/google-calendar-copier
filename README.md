@@ -3,7 +3,7 @@
 Reads events from multiple source events. Filters events based on event summary and description. Inserts filtered events to one destination calendar.
 
 ## Usage
-dotnet run <config.json-file-path>
+dotnet run <config.json-file-path> <oauth-tokens-folder-path/>
 
 ## Configuration
 
