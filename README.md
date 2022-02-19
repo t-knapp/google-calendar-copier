@@ -1,21 +1,34 @@
 # google-calendar-copier
 
-Reads events from multiple source events. Filters events based on event summary and description. Inserts filtered events to one destination calendar.
+Reads events from multiple source calendars. Filters events based on event summary and description. Inserts filtered events to one destination calendar.
 
-## Runtime
+## Build
 ```
-dotnet google-calendar-copier.dll <config.json-file-path> <oauth-tokens-folder-path>
+dotnet publish
+```
+
+## Run
+```
+dotnet google-calendar-copier.dll
+```
+or
+```
+./google-calendar-copier
 ```
 
 ## Configuration
 Configuration file in JSON format is provided as first CLI argument.
 
 ```
-{
-    "SourceCalendars": ["<google-calendar-id>", "<google-calendar-id>"],
-    "SummaryValues": ["Stand-Up", "Team-Meeting", "Kick-Off"],
-    "DescriptionValues": ["Your Name", "Your Mention", "Some Text"],
-    "DestinationCalendar": "<google-calendar-id>"
+{   
+    "Settings": {
+        "SourceCalendars": ["<google-calendar-id>", "<google-calendar-id>"],
+        "SummaryValues": ["Stand-Up", "Team-Meeting", "Kick-Off"],
+        "DescriptionValues": ["Your Name", "Your Mention", "Some Text"],
+        "DestinationCalendar": "<google-calendar-id>",
+        "CredentialsFilePath": "<absolute-path-to-credentials-file-for-google-api>",
+        "DryRun": false
+    }
 }
 ```
 `SummaryValues` are checked with equals.
@@ -24,5 +37,5 @@ Both filter are logical OR combined.
 
 ## Development
 ```
-dotnet run <config.json-file-path> <oauth-tokens-folder-path>
+dotnet run
 ```
